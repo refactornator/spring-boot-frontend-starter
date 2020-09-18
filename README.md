@@ -1,5 +1,7 @@
 # Spring Boot Frontend Starter
 
+![CodeQL](https://github.com/wlindner/spring-boot-frontend-starter/workflows/CodeQL/badge.svg)
+
 ## Install Dependencies
 
 ```
