@@ -1,3 +1,4 @@
+.DS_Store
 HELP.md
 .gradle
 build/
@@ -34,7 +35,7 @@ out/
 .vscode/
 
 ### Frontend Dependencies ###
-node_modules/
+/node_modules/
 
 ### Frontend Bundle ###
 src/main/resources/static/*
