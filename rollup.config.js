@@ -2,7 +2,7 @@ import path from "path";
 import copy from "rollup-plugin-copy";
 import svelte from "rollup-plugin-svelte";
 import cleaner from "rollup-plugin-cleaner";
-import html from "@open-wc/rollup-plugin-html";
+import html from "@rollup/plugin-html";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import { terser } from "rollup-plugin-terser";
@@ -23,16 +23,6 @@ export default {
       targets: [staticDir],
     }),
 
-    !production &&
-      copy({
-        targets: [
-          {
-            src: "node_modules/livereload-js/dist/livereload.js",
-            dest: staticDir,
-          },
-        ],
-      }),
-
     svelte({
       // enable run-time checks when not in production
       dev: !production,
@@ -45,14 +35,28 @@ export default {
 
     html({
       title: "My App",
-      transform: (html) =>
-        production
-          ? html
-          : html.replace(
-              "</body>",
-              '<script src="./livereload.js?port=35729"></script></body>'
-            ),
     }),
+
+    !production &&
+      copy({
+        targets: [
+          {
+            src: "node_modules/livereload-js/dist/livereload.js",
+            dest: staticDir,
+          },
+        ],
+      }),
+
+    !production && {
+      name: "inject-livereload",
+      generateBundle(options, bundle) {
+        const index = bundle["index.html"];
+        index.source = index.source.replace(
+          "  </body>\n",
+          '    <script src="./livereload.js?port=35729"></script>\n  </body>'
+        );
+      },
+    },
 
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In

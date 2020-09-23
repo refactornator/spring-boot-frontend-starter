@@ -6,8 +6,8 @@
     "start": "rollup -c -w"
   },
   "devDependencies": {
-    "@open-wc/rollup-plugin-html": "^1.2.3",
     "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-html": "^0.2.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "livereload-js": "^3.3.1",
     "rollup": "^2.28.1",
