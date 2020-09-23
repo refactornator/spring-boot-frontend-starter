@@ -1,5 +1,5 @@
+import fs from "fs-extra";
 import path from "path";
-import copy from "rollup-plugin-copy";
 import svelte from "rollup-plugin-svelte";
 import cleaner from "rollup-plugin-cleaner";
 import html from "@rollup/plugin-html";
@@ -24,7 +24,6 @@ export default {
     }),
 
     svelte({
-      // enable run-time checks when not in production
       dev: !production,
       // we'll extract any component CSS out into
       // a separate file - better for performance
@@ -37,24 +36,20 @@ export default {
       title: "My App",
     }),
 
-    !production &&
-      copy({
-        targets: [
-          {
-            src: "node_modules/livereload-js/dist/livereload.js",
-            dest: staticDir,
-          },
-        ],
-      }),
-
     !production && {
       name: "inject-livereload",
       generateBundle(options, bundle) {
         const index = bundle["index.html"];
-        index.source = index.source.replace(
-          "  </body>\n",
-          '    <script src="./livereload.js?port=35729"></script>\n  </body>'
-        );
+        if (index) {
+          fs.copy(
+            "node_modules/livereload-js/dist/livereload.js",
+            `${staticDir}/livereload.js`
+          );
+          index.source = index.source.replace(
+            "  </body>\n",
+            '    <script src="livereload.js?port=35729"></script>\n  </body>\n'
+          );
+        }
       },
     },
 
