@@ -1,4 +1,4 @@
-import fs from "fs-extra";
+import fs from "fs";
 import path from "path";
 import svelte from "rollup-plugin-svelte";
 import cleaner from "rollup-plugin-cleaner";
@@ -41,13 +41,18 @@ export default {
       generateBundle(options, bundle) {
         const index = bundle["index.html"];
         if (index) {
-          fs.copy(
-            "node_modules/livereload-js/dist/livereload.js",
-            `${staticDir}/livereload.js`
-          );
           index.source = index.source.replace(
             "  </body>\n",
             '    <script src="livereload.js?port=35729"></script>\n  </body>\n'
+          );
+        }
+      },
+      writeBundle(options, bundle) {
+        const index = bundle["index.html"];
+        if (index) {
+          fs.copyFileSync(
+            path.resolve("node_modules/livereload-js/dist/livereload.js"),
+            path.resolve(`${options.dir}/livereload.js`)
           );
         }
       },
