@@ -1,12 +1,14 @@
 import path from "path";
+import copy from "rollup-plugin-copy";
 import svelte from "rollup-plugin-svelte";
-import html from "@rollup/plugin-html";
+import cleaner from "rollup-plugin-cleaner";
+import html from "@open-wc/rollup-plugin-html";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
-const resources = path.resolve(__dirname, "src/main/resources");
+const staticDir = path.resolve(__dirname, "src/main/resources/static");
 
 export default {
   input: "frontend/index.js",
@@ -14,9 +16,23 @@ export default {
     sourcemap: true,
     format: "iife",
     name: "app",
-    file: `${resources}/static/bundle.js`,
+    dir: staticDir,
   },
   plugins: [
+    cleaner({
+      targets: [staticDir],
+    }),
+
+    !production &&
+      copy({
+        targets: [
+          {
+            src: "node_modules/livereload-js/dist/livereload.js",
+            dest: staticDir,
+          },
+        ],
+      }),
+
     svelte({
       // enable run-time checks when not in production
       dev: !production,
@@ -29,6 +45,13 @@ export default {
 
     html({
       title: "My App",
+      transform: (html) =>
+        production
+          ? html
+          : html.replace(
+              "</body>",
+              '<script src="./livereload.js?port=35729"></script></body>'
+            ),
     }),
 
     // If you have external dependencies installed from
