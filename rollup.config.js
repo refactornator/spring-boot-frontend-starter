@@ -1,10 +1,10 @@
-import fs from "fs";
 import path from "path";
 import svelte from "rollup-plugin-svelte";
 import cleaner from "rollup-plugin-cleaner";
 import html from "@rollup/plugin-html";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import livereloadClient from "rollup-plugin-livereload-client";
 import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
@@ -36,27 +36,7 @@ export default {
       title: "My App",
     }),
 
-    !production && {
-      name: "inject-livereload",
-      generateBundle(options, bundle) {
-        const index = bundle["index.html"];
-        if (index) {
-          index.source = index.source.replace(
-            "  </body>\n",
-            '    <script src="livereload.js?port=35729"></script>\n  </body>\n'
-          );
-        }
-      },
-      writeBundle(options, bundle) {
-        const index = bundle["index.html"];
-        if (index) {
-          fs.copyFileSync(
-            path.resolve("node_modules/livereload-js/dist/livereload.js"),
-            path.resolve(`${options.dir}/livereload.js`)
-          );
-        }
-      },
-    },
+    !production && livereloadClient(),
 
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
