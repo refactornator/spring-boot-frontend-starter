@@ -1,6 +1,5 @@
 import path from "path";
 import svelte from "rollup-plugin-svelte";
-import cleaner from "rollup-plugin-cleaner";
 import html from "@rollup/plugin-html";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
@@ -19,10 +18,6 @@ export default {
     dir: staticDir,
   },
   plugins: [
-    cleaner({
-      targets: [staticDir],
-    }),
-
     svelte({
       dev: !production,
       // we'll extract any component CSS out into
@@ -36,7 +31,7 @@ export default {
       title: "My App",
     }),
 
-    !production && livereloadClient(),
+    livereloadClient({ include: !production }),
 
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
