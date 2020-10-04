@@ -3,7 +3,9 @@ import svelte from "rollup-plugin-svelte";
 import html from "@rollup/plugin-html";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-import livereloadClient from "rollup-plugin-livereload-client";
+import postcss from "rollup-plugin-postcss";
+import del from "rollup-plugin-delete";
+import livereload from "rollup-plugin-livereload";
 import { terser } from "rollup-plugin-terser";
 
 const production = !process.env.ROLLUP_WATCH;
@@ -16,8 +18,10 @@ export default {
     format: "iife",
     name: "app",
     dir: staticDir,
+    entryFileNames: production ? "[name].[hash].js" : "[name].js",
   },
   plugins: [
+    del({ targets: staticDir }),
     svelte({
       dev: !production,
       // we'll extract any component CSS out into
@@ -27,11 +31,17 @@ export default {
       },
     }),
 
+    postcss({
+      extract: true,
+      sourceMap: true,
+      minimize: production,
+    }),
+
     html({
       title: "My App",
     }),
 
-    livereloadClient({ include: !production }),
+    !production && livereload(staticDir),
 
     // If you have external dependencies installed from
     // npm, you'll most likely need these plugins. In
